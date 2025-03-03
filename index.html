@@ -1,0 +1,67 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Stock Checker</title>
+    <script>
+        async function searchStock() {
+            let sn = document.getElementById("snInput").value;
+            let url = `https://script.google.com/macros/s/AKfycbwxUD9K180OdXWQd6sOQ1jf8YDb2NBhQjVcRJy_lcFrywyfSyGUYSdtR_xS0TFmeVdXVw/exec?sn=${sn}`;
+
+            try {
+                let response = await fetch(url, {
+                    method: "GET",
+                    headers: {
+                        "Content-Type": "application/json"
+                    }
+                });
+
+                if (!response.ok) {
+                    throw new Error("Network response was not ok");
+                }
+
+                let data = await response.json();
+                console.log(data);
+                
+                if (data.error) {
+                    document.getElementById("result").innerHTML = `<p style="color: red;">${data.error}</p>`;
+                } else {
+                    let output = `
+                        <table border="1">
+                            <tr>
+                                <th>Itemtype</th>
+                                <th>Code</th>
+                                <th>Product</th>
+                                <th>SN</th>
+                                <th>Qty</th>
+                                <th>Aging</th>
+                                <th>Store</th>
+                            </tr>
+                            <tr>
+                                <td>${data[0].itemtype}</td>
+                                <td>${data[0].code}</td>
+                                <td>${data[0].product}</td>
+                                <td>${data[0].sn}</td>
+                                <td>${data[0].qty}</td>
+                                <td>${data[0].aging}</td>
+                                <td>${data[0].store}</td>
+                            </tr>
+                        </table>
+                    `;
+                    document.getElementById("result").innerHTML = output;
+                }
+            } catch (error) {
+                console.error("Fetch error:", error);
+                document.getElementById("result").innerHTML = `<p style="color: red;">เกิดข้อผิดพลาดในการดึงข้อมูล</p>`;
+            }
+        }
+    </script>
+</head>
+<body>
+    <h2>ระบบเช็คสต็อกสินค้า</h2>
+    <input type="text" id="snInput" placeholder="กรอก SN">
+    <button onclick="searchStock()">ค้นหา</button>
+    <div id="result"></div>
+</body>
+</html>
